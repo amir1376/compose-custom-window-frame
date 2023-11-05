@@ -98,7 +98,7 @@ fun FrameWindowScope.WindowsActionButtons(
 ) {
     Row(
         // Toolbar is aligned center vertically so I fill that and place it on top
-        modifier = Modifier.fillMaxHeight().wrapContentHeight(Alignment.Top),
+        modifier = Modifier,
         verticalAlignment = Alignment.Top
     ) {
         onRequestMinimize?.let {

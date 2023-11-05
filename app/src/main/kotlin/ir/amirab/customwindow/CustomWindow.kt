@@ -107,7 +107,7 @@ private fun FrameWindowScope.FrameContent(
     onRequestClose: () -> Unit,
 ) {
     Row(
-        Modifier.fillMaxWidth().height(32.dp),
+        Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(Modifier.width(24.dp))
@@ -189,8 +189,6 @@ fun CustomWindow(
             LocalWindowController provides windowController,
             LocalWindowState provides state,
         ) {
-            val fm = LocalFocusManager.current
-
             val icon by rememberUpdatedState(windowController.icon)
             val onIconClick by rememberUpdatedState(windowController.onIconClick)
             // a window frame which totally rendered with compose

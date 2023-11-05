@@ -1,5 +1,6 @@
 package ir.amirab
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -25,7 +26,7 @@ object HitSpots {
 }
 
 
-private val LocalWindowHitSpots = compositionLocalOf<MutableMap<Any, Pair<Rectangle, Int>>> { error("Fuck") }
+private val LocalWindowHitSpots = compositionLocalOf<MutableMap<Any, Pair<Rectangle, Int>>> { error("LocalWindowHitSpots not provided") }
 
 context (FrameWindowScope)
 @Composable
@@ -35,18 +36,29 @@ fun ProvideWindowSpotContainer(
     val stateMap = remember {
         mutableStateMapOf<Any, Pair<Rectangle, Int>>()
     }
+    var height by remember {
+        mutableStateOf(0)
+    }
     LaunchedEffect(
         stateMap.toMap(),
+        height,
         window
     ) {
         if (CustomWindowDecorationAccessing.isSupported) {
-            reDrawFrame(window, stateMap)
+            reDrawFrame(window, stateMap, height)
         }
     }
     CompositionLocalProvider(
         LocalWindowHitSpots provides stateMap
     ) {
-        content()
+        val density = LocalDensity.current
+        Box(Modifier.onGloballyPositioned {
+            height = with(density) {
+                it.size.height.toAwtUnitSize()
+            }
+        }) {
+            content()
+        }
     }
 }
 
@@ -102,25 +114,35 @@ private fun Offset.toDpRectangle(
     val offset = this
     density.run {
 //      TODO investigate
-//       why I have to add this margin to offset.x to precise
-//       position of buttons in window frame.
+//       why I have to add this margin to offset.x to accurate
+//       the position of buttons in window frame.
 //       it must not be!
         val weirdMargin = 11f
         return Rectangle(
-            (offset.x + weirdMargin).toDp().value.toInt(),
-            offset.y.toDp().value.toInt(),
-            width.toDp().value.toInt(),
-            height.toDp().value.toInt(),
+            (offset.x + weirdMargin).toAwtUnitSize(),
+            offset.y.toAwtUnitSize(),
+            width.toAwtUnitSize(),
+            height.toAwtUnitSize(),
         )
     }
 }
 
+context (Density)
+private fun Int.toAwtUnitSize() = toDp().value.toInt()
 
-private fun reDrawFrame(window: Window, list: Map<Any, Pair<Rectangle, Int>>) {
+context (Density)
+private fun Float.toAwtUnitSize() = toDp().value.toInt()
+
+
+private fun reDrawFrame(
+    window: Window,
+    list: Map<Any, Pair<Rectangle, Int>>,
+    height: Int,
+) {
     CustomWindowDecorationAccessing.setCustomDecorationEnabled(window, true)
     CustomWindowDecorationAccessing.setCustomDecorationTitleBarHeight(
         window,
-        list.maxOfOrNull { it.value.first.height } ?: 0
+        height,
     )
     val spots: Map<Shape, Int> = list.values.associate { it }
     CustomWindowDecorationAccessing.setCustomDecorationHitTestSpotsMethod(window, spots)
