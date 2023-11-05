@@ -2,6 +2,10 @@
 
 A simple library that add support for custom window frame for compose desktop that supports aero snap
 
+## Demo
+![Demo](/static/sample.gif)
+
+
  Please check `app` module for sample usage
 
 ### Note
