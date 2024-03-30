@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.FrameWindowScope
+import androidx.compose.ui.window.WindowState
 import ir.amirab.util.CustomWindowDecorationAccessing
 import java.awt.Rectangle
 import java.awt.Shape
@@ -117,6 +118,7 @@ context (FrameWindowScope)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ProvideWindowSpotContainer(
+    windowState: WindowState,
     content: @Composable () -> Unit,
 ) {
     val density = LocalDensity.current
@@ -152,7 +154,10 @@ fun ProvideWindowSpotContainer(
             val spots: Map<Shape, Int> = spotsWithInfo.values.associate { (rect, spot) ->
                 Rectangle(rect.x + startWidthOffsetInDp, rect.y, rect.width, rect.height) to spot
             }
+            val lastPlacement=windowState.placement
             placeHitSpots(window, spots, toolbarHeight)
+            //it seems after activating hit spots window class will change its placement
+            window.placement=lastPlacement
         }
     }
     CompositionLocalProvider(

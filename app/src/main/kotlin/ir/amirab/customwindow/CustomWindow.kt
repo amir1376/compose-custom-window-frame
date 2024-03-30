@@ -51,7 +51,8 @@ private fun FrameWindowScope.CustomWindowFrame(
                 center = center,
                 onRequestMinimize = onRequestMinimize,
                 onRequestClose = onRequestClose,
-                onRequestToggleMaximize = onRequestToggleMaximize
+                onRequestToggleMaximize = onRequestToggleMaximize,
+                windowState = LocalWindowState.current
             )
             content()
         }
@@ -81,8 +82,11 @@ fun FrameWindowScope.SnapDraggableToolbar(
     onRequestMinimize: (() -> Unit)?,
     onRequestToggleMaximize: (() -> Unit)?,
     onRequestClose: () -> Unit,
+    windowState: WindowState,
 ) {
-    ProvideWindowSpotContainer {
+    ProvideWindowSpotContainer(
+        windowState = windowState
+    ) {
         if (CustomWindowDecorationAccessing.isSupported) {
             FrameContent(title, windowIcon, center, onRequestMinimize, onRequestToggleMaximize, onRequestClose)
         } else {
