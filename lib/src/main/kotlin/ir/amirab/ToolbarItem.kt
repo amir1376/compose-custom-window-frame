@@ -137,7 +137,9 @@ fun ProvideWindowSpotContainer(
     }
 
     val spotsWithInfo = spotInfoState.toMap()
-
+    var shouldRestorePlacement by remember(window) {
+        mutableStateOf(true)
+    }
     //if any of this keys change we will re position hit spots
     LaunchedEffect(
         spotsWithInfo,
@@ -154,10 +156,18 @@ fun ProvideWindowSpotContainer(
             val spots: Map<Shape, Int> = spotsWithInfo.values.associate { (rect, spot) ->
                 Rectangle(rect.x + startWidthOffsetInDp, rect.y, rect.width, rect.height) to spot
             }
-            val lastPlacement=windowState.placement
-            placeHitSpots(window, spots, toolbarHeight)
             //it seems after activating hit spots window class will change its placement
-            window.placement=lastPlacement
+            //we only want to restore placement whe windows is loaded for first time
+            if (shouldRestorePlacement){
+                //this block only called once for each window
+                val lastPlacement=windowState.placement
+                placeHitSpots(window, spots, toolbarHeight)
+                window.placement=lastPlacement
+                shouldRestorePlacement=false
+            }else{
+                placeHitSpots(window, spots, toolbarHeight)
+            }
+
         }
     }
     CompositionLocalProvider(
