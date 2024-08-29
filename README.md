@@ -8,7 +8,7 @@ A simple library that add support for custom window frame for compose desktop th
 
 ## Usage
 
- - For simple usage Please check `app` module for sample usage
+ - Please check `app` module for sample usage
  - I also used this in the [AB Download Manager](https://github.com/amir1376/ab-download-manager)
 
 ## Note
